@@ -1,0 +1,12 @@
+## Interface: 11507
+## Interface-Classic: 11507
+## Interface-BCC: 20504
+## Interface-Wrath: 30403
+## Interface-Cata: 40402
+## Title: CustomTargetMarkers
+## Notes: Displays a raid target icon picker above an enemy's nameplate when targeted.
+## Author: Jack
+## Version: 1.0.0
+## X-Category: Interface Enhancements
+
+CustomTargetMarkers.lua
