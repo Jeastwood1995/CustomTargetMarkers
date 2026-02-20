@@ -66,7 +66,7 @@ local ICON_TEX  = "Interface\\TARGETINGFRAME\\UI-RaidTargetingIcons"
 local NUM_ICONS = #ICON_ORDER   -- 8
 local NUM_BTNS  = NUM_ICONS + 1 -- +1 for the clear button
 
--- Runtime reference to the saved DB (set in ADDON_LOADED)
+-- Runtime reference to the saved DB (set in VARIABLES_LOADED / PLAYER_LOGIN)
 local db
 
 -- ============================================================
@@ -182,7 +182,7 @@ clearBtn:SetScript("OnClick", function()
     if UnitExists("target") then SetRaidTarget("target", 0) end
 end)
 
--- Build initial buttons (position/size applied properly after ADDON_LOADED)
+-- Build initial buttons (position/size applied properly after VARIABLES_LOADED)
 for _, idx in ipairs(ICON_ORDER) do
     MakeIconButton(idx, 28)
 end
@@ -338,8 +338,40 @@ end)
 -- ============================================================
 -- Events
 -- ============================================================
+-- Shared initialisation logic called by VARIABLES_LOADED and PLAYER_LOGIN.
+-- Using both events ensures saved variables are available on all client
+-- versions: 1.12 (TurtleWoW), Classic Era, Wrath, Cata, etc.
+local addonInitDone = false
+local function InitAddon()
+    if addonInitDone then return end
+    addonInitDone = true
+
+    if not CustomTargetMarkersDB then
+        CustomTargetMarkersDB = {}
+    end
+    for k, v in pairs(CTM_DB_DEFAULTS) do
+        if CustomTargetMarkersDB[k] == nil then
+            CustomTargetMarkersDB[k] = v
+        end
+    end
+    db = CustomTargetMarkersDB
+
+    ApplySize(db.iconSize)
+
+    if not db.locked then
+        dragLabel:Show()
+    end
+
+    print("|cff00ff00[CustomTargetMarkers]|r Loaded. Type |cffFFFF00/ctm|r for options.")
+end
+
 local ev = CreateFrame("Frame")
-ev:RegisterEvent("ADDON_LOADED")
+-- VARIABLES_LOADED  = fired on 1.12 / TurtleWoW once saved vars are ready
+-- ADDON_LOADED      = fired on 2.0+ (Burning Crusade and later)
+-- PLAYER_LOGIN      = belt-and-suspenders fallback on all versions
+ev:RegisterEvent("VARIABLES_LOADED")
+ev:RegisterEvent("PLAYER_LOGIN")
+if ev.RegisterEvent and pcall(ev.RegisterEvent, ev, "ADDON_LOADED") then end
 ev:RegisterEvent("PLAYER_TARGET_CHANGED")
 ev:RegisterEvent("PLAYER_ENTERING_WORLD")
 ev:RegisterEvent("RAID_TARGET_UPDATE")
@@ -349,26 +381,10 @@ if C_NamePlate then
 end
 
 ev:SetScript("OnEvent", function(self, event, arg1)
-    if event == "ADDON_LOADED" and arg1 == "CustomTargetMarkers" then
-        -- Initialise / migrate saved variables
-        if not CustomTargetMarkersDB then
-            CustomTargetMarkersDB = {}
-        end
-        for k, v in pairs(CTM_DB_DEFAULTS) do
-            if CustomTargetMarkersDB[k] == nil then
-                CustomTargetMarkersDB[k] = v
-            end
-        end
-        db = CustomTargetMarkersDB
-
-        ApplySize(db.iconSize)
-
-        -- Show drag label if not locked
-        if not db.locked then
-            dragLabel:Show()
-        end
-
-        print("|cff00ff00[CustomTargetMarkers]|r Loaded. Type |cffFFFF00/ctm|r for options.")
+    if event == "VARIABLES_LOADED"
+    or event == "PLAYER_LOGIN"
+    or (event == "ADDON_LOADED" and arg1 == "CustomTargetMarkers") then
+        InitAddon()
 
     elseif event == "PLAYER_TARGET_CHANGED" then
         ShowPopup()
