@@ -63,8 +63,8 @@ local ICON_COORDS = {
 }
 
 local ICON_TEX  = "Interface\\TARGETINGFRAME\\UI-RaidTargetingIcons"
-local NUM_ICONS = #ICON_ORDER   -- 8
-local NUM_BTNS  = NUM_ICONS + 1 -- +1 for the clear button
+local NUM_ICONS = table.getn(ICON_ORDER)   -- 8  (Lua 5.0 compatible, no # operator)
+local NUM_BTNS  = NUM_ICONS + 1            -- +1 for the clear button
 
 -- Runtime reference to the saved DB (set in VARIABLES_LOADED / PLAYER_LOGIN)
 local db
