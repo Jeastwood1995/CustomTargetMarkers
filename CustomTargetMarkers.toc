@@ -5,8 +5,9 @@
 ## Interface-Cata: 40402
 ## Title: CustomTargetMarkers
 ## Notes: Displays a raid target icon picker above an enemy's nameplate when targeted.
-## Author: Jack
+## Author: Jeastwood1995
 ## Version: 1.0.0
 ## X-Category: Interface Enhancements
+## SavedVariables: CustomTargetMarkersDB
 
 CustomTargetMarkers.lua
