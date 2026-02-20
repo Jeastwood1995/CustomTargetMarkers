@@ -139,7 +139,8 @@ local buttons = {}
 
 local function MakeIconButton(markerIndex, iconSize)
     local btn = CreateFrame("Button", "CTM_Btn_" .. markerIndex, popup)
-    btn:SetSize(iconSize, iconSize)
+    btn:SetWidth(iconSize)
+    btn:SetHeight(iconSize)
 
     btn:SetNormalTexture(ICON_TEX)
     local c = ICON_COORDS[markerIndex]
@@ -192,18 +193,21 @@ end
 -- ============================================================
 local function ApplySize(iconSize)
     local w, h = CalcFrameSize(iconSize)
-    popup:SetSize(w, h)
+    popup:SetWidth(w)
+    popup:SetHeight(h)
 
     for pos, idx in ipairs(ICON_ORDER) do
         local btn  = buttons[idx]
         local xOff = CFG.framePad + (pos - 1) * (iconSize + CFG.iconPad)
-        btn:SetSize(iconSize, iconSize)
+        btn:SetWidth(iconSize)
+        btn:SetHeight(iconSize)
         btn:ClearAllPoints()
         btn:SetPoint("LEFT", popup, "LEFT", xOff, 0)
     end
 
     local clearXOff = CFG.framePad + NUM_ICONS * (iconSize + CFG.iconPad)
-    clearBtn:SetSize(iconSize, iconSize)
+    clearBtn:SetWidth(iconSize)
+    clearBtn:SetHeight(iconSize)
     clearBtn:ClearAllPoints()
     clearBtn:SetPoint("LEFT", popup, "LEFT", clearXOff, 0)
 end
@@ -427,7 +431,8 @@ SlashCmdList["CTM"] = function(msg)
         return
     end
 
-    local cmd, arg = msg:match("^(%S*)%s*(.-)%s*$")
+    -- string.match is Lua 5.1+; use string.find with captures for Lua 5.0
+    local _, _, cmd, arg = string.find(msg, "^(%S*)%s*(.-)%s*$")
     cmd = cmd:lower()
 
     if cmd == "" then
