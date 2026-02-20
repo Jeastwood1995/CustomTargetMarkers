@@ -370,12 +370,10 @@ local function InitAddon()
 end
 
 local ev = CreateFrame("Frame")
--- VARIABLES_LOADED  = fired on 1.12 / TurtleWoW once saved vars are ready
--- ADDON_LOADED      = fired on 2.0+ (Burning Crusade and later)
--- PLAYER_LOGIN      = belt-and-suspenders fallback on all versions
+-- VARIABLES_LOADED fires on 1.12 / TurtleWoW once saved vars are ready
+-- PLAYER_LOGIN fires on all client versions as a reliable fallback
 ev:RegisterEvent("VARIABLES_LOADED")
 ev:RegisterEvent("PLAYER_LOGIN")
-if ev.RegisterEvent and pcall(ev.RegisterEvent, ev, "ADDON_LOADED") then end
 ev:RegisterEvent("PLAYER_TARGET_CHANGED")
 ev:RegisterEvent("PLAYER_ENTERING_WORLD")
 ev:RegisterEvent("RAID_TARGET_UPDATE")
@@ -386,8 +384,7 @@ end
 
 ev:SetScript("OnEvent", function(self, event, arg1)
     if event == "VARIABLES_LOADED"
-    or event == "PLAYER_LOGIN"
-    or (event == "ADDON_LOADED" and arg1 == "CustomTargetMarkers") then
+    or event == "PLAYER_LOGIN" then
         InitAddon()
 
     elseif event == "PLAYER_TARGET_CHANGED" then
